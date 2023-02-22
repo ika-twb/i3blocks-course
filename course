@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+
+# course ---
+#
+# Filename: course
+# Description: An `i3block' script to display your current class status in i3bar
+# Author: ika
+# Maintainer: ika
+# Copyleft (Ↄ) 2023 ika
+# Created: Wed Feb 22 20:29:18 2023 (+0800)
+# Version: v0.1
+# Package-Requires: i3blocks, env, python3.10, date, [emacs, emacsclient]
+# Last-Updated: Wed Feb 22 21:10:36 2023 (+0800)
+#           By:ika
+#     Update #: 20
+# URL:
+# Doc URL:
+# Keywords:
+# Compatibility: Issues not yet found
+#
+#
+
+# Commentary:
+# This script is meant to be used with i3block to display your current
+# class status. The class status metadata should be written in yaml
+# with each course looking like this:
+#
+# compstr:
+#   fullname: 计算机组成与体系结构
+#   abbrev: 计组
+#   time: [[Mon, 8:00, 10:40], [Fri, 16:20, 18:00]]
+#   path: /path/to/your/course1/folder
+#
+# crypto:
+#   fullname: 密码学基础
+#   abbrev: 密码
+#   time: [[Wed, 8:00, 10:40], [Thu, 16:20, 18:00]]
+#   path: /path/to/your/course/folder
+#
+# Then it goes through the yaml file to generate a daily timetable,
+# and display if you are currently in class or countdown of your next
+# class.
+
+
+# Change Log:
+# v0.1 -- working demo
+#
+#
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#
+
+# Code:
+
+import yaml
+import subprocess
+import os
+
+# Metadata file path
+fmetadata = '/home/ika/course-metadata.yaml'
+
+outputstring = ''
+outputpath = ''
+
+timetable = {'Mon': [], 'Tue': [], 'Wed': [], 'Thu': [], 'Fri': []}
+
+# Lazy job, don't do this kids.
+def nextday(day: str) -> str:
+    match day:
+        case 'Mon':
+            return 'Tue'
+        case 'Tue':
+            return 'Wed'
+        case 'Wed':
+            return 'Thu'
+        case 'Thu':
+            return 'Fri'
+        case 'Fri':
+            return 'Mon'
+
+# Calls `date' command to get current weekday, hour, and minute.
+(current_day, current_hour, current_minute) = \
+    subprocess.check_output(["date","+%a:%H:%M"])\
+              .strip().decode().split(":")
+
+# For debugging
+# (current_day, current_hour, current_minute) = "Thu 21 00".split(" ")
+
+(current_hour, current_minute) = (int( current_hour), int( current_minute))
+
+curtime = current_hour *60 +current_minute
+
+with open(fmetadata, 'r') as stream:
+    try:
+        courses = yaml.safe_load(stream)
+    except yaml.YAMLError as exc:
+        print(exc)
+        exit(0)
+
+# Generate Timetable
+for icourse in courses:
+    for itime in courses[icourse]['time']:
+        timetable[ itime[ 0]]\
+        .append( [itime[1], \
+                  # Start time
+                  itime[2], \
+                  # End time
+                  courses[icourse]['abbrev'], \
+                  courses[icourse]['path'] \
+                  ] )
+
+# Sort the timetable for each day so you could select the first one.
+for eachday in timetable:
+    # Sort using start time
+    timetable[eachday] = sorted( timetable[eachday], key=lambda a: a[0])
+
+
+nextday_1st_class = timetable[ nextday( current_day)] [0]
+minutes_whole_day = 24*60
+timegap = nextday_1st_class[0] + minutes_whole_day - curtime
+if timegap <= 60:
+    timegap_str = str(timegap) + 'm'
+else:
+    timegap_str = (str( timegap // 60) + 'h ' + str( timegap % 60) + 'm')
+
+outputstring = \
+    nextday_1st_class [2] + " : In %s " % (timegap_str)
+    # ^^ Class name abbrev
+
+
+# If there is still classes today, `outputstring' will be overwritten
+
+for each_class in timetable[current_day]:
+    # There is a class later?
+    if curtime < each_class[0]:
+        timegap = each_class[0] - curtime
+        timegap_str = (str(timegap // 60) + 'h' + str(timegap % 60) + 'm') \
+            if timegap <= 60 else (str(timegap) + 'm')
+        outputstring = "In %s : " % (timegap_str) + each_class[2] # Overwritten
+
+    # Oh we're in one right now!
+    elif curtime >= each_class[0] and curtime <= each_class[1]:
+        outputstring = 'In Progress: ' + each_class[2] # Overwritten
+        outputpath = each_class[3]
+        break                   # no need to find other classes when present in one
+    else:
+        continue
+
+# If the button was right-clicked
+# an emacsclient will create a new frame and open `dired'
+# at the path of the course you are in right now.
+# If not in class, nothing happens.
+
+# check i3bar protocol for more information
+# https://i3wm.org/docs/i3bar-protocol.html#_click_events
+
+if 'BLOCK_BUTTON' in os.environ:
+        buttonType = os.environ['BLOCK_BUTTON']
+        if buttonType == '3' and outputpath != '':
+            os.system("/usr/bin/emacsclient -c -e '(dired \"%s\")'" % outputpath)
+
+# Final Output
+print(outputstring)
+
+#
+# course ends here
