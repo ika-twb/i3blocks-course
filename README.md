@@ -1,5 +1,5 @@
 # i3blocks-course
-An `i3block' script to display your current class status in i3bar.
+An `i3blocks' script to display your current class status in i3 bar.
 
 More features to come.
 
@@ -20,7 +20,7 @@ crypto:
   path: /path/to/your/course/folder
 ```
 
-and it's path is specified using the `fmetadata` variable.
+and its path is specified using the `fmetadata` variable.
 
 ## How do I use it?
 You may symlink or copy the `course` file under your `$SCRIPT_DIR`, which is specified in
