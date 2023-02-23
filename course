@@ -10,9 +10,9 @@
 # Created: Wed Feb 22 20:29:18 2023 (+0800)
 # Version: v0.1
 # Package-Requires: i3blocks, env, python3.10, date, [emacs, emacsclient]
-# Last-Updated: Thu Feb 23 11:40:32 2023 (+0800)
+# Last-Updated: Thu Feb 23 15:10:39 2023 (+0800)
 #           By:ika
-#     Update #: 25
+#     Update #: 28
 # URL:
 # Doc URL:
 # Keywords:
@@ -43,8 +43,12 @@
 
 
 # Change Log:
-# v0.1 -- working demo
+# 23-Feb-2023    ika
+#    Last-Updated: Thu Feb 23 15:09:25 2023 (+0800) #27
+#    added countdown for class in progress
 #
+# 22-Feb-2023    ika
+#    v0.1   -- working demo
 #
 #
 # This program is free software: you can redistribute it and/or modify
