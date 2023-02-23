@@ -10,9 +10,9 @@
 # Created: Wed Feb 22 20:29:18 2023 (+0800)
 # Version: v0.1
 # Package-Requires: i3blocks, env, python3.10, date, [emacs, emacsclient]
-# Last-Updated: Thu Feb 23 11:36:18 2023 (+0800)
+# Last-Updated: Thu Feb 23 11:40:32 2023 (+0800)
 #           By:ika
-#     Update #: 23
+#     Update #: 25
 # URL:
 # Doc URL:
 # Keywords:
@@ -142,8 +142,6 @@ outputstring = \
 
 # If there is still classes today, `outputstring' will be overwritten
 
-print(timetable)
-
 for each_class in timetable[current_day]:
     # There is a class later?
     if curtime < each_class[0]:
@@ -153,6 +151,9 @@ for each_class in timetable[current_day]:
         else:
             timegap_str = (str( timegap // 60) + 'h ' + str( timegap % 60) + 'm')
         outputstring = "In %s : " % (timegap_str) + each_class[2] # Overwritten
+        break
+    # Timetable is sorted so only choose the first class matched.
+
 
     # Oh we're in one right now!
     elif curtime >= each_class[0] and curtime <= each_class[1]:
