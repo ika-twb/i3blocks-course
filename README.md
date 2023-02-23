@@ -3,24 +3,28 @@ An `i3blocks' script to display your current class status in i3 bar.
 
 More features to come.
 
-## How does it read data of my courses?
+## How does it get information about my courses?
 Write down your course metadata in a yaml file like this:
 
 ``` yaml
 compstr:
   fullname: 计算机组成与体系结构
   abbrev: 计组
-  time: [[Mon, 8:00, 10:40], [Fri, 16:20, 18:00]]
+  time: [[Wed, 8:00, 10:40, H3108], [Thu, 16:20, 18:00, H2101]]
   path: /path/to/your/course1/folder
 
 crypto:
   fullname: 密码学基础
   abbrev: 密码
-  time: [[Wed, 8:00, 10:40], [Thu, 16:20, 18:00]]
-  path: /path/to/your/course/folder
+  time: [[Wed, 8:00, 10:40, H3108]]
+  path: /path/to/your/course2/folder
 ```
 
 and its path is specified using the `fmetadata` variable.
+
+The `time` field should be an array of one or multiple four element array,
+which includes the day of the week, start time, end time,
+and classroom number, in that order.
 
 ## How do I use it?
 You may symlink or copy the `course` file under your `$SCRIPT_DIR`, which is specified in
