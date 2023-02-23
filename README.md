@@ -39,6 +39,11 @@ interval=60
 
 `interval` is a number of seconds between each running of the script.
 
+If you have Emacs and Emacs client installed, when you right-click the
+botton AND you are currently in a class, an `emacsclient` frame with a
+Dired buffer of the directory for your current class (the `path`) will
+popup.
+
 ## How do I contribute?
 Issues and pull requests always welcome.
 
