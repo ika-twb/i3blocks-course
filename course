@@ -10,9 +10,9 @@
 # Created: Wed Feb 22 20:29:18 2023 (+0800)
 # Version: v0.1
 # Package-Requires: i3blocks, env, python3.10, date, [emacs, emacsclient]
-# Last-Updated: Thu Feb 23 15:10:39 2023 (+0800)
+# Last-Updated: Thu Feb 23 15:49:09 2023 (+0800)
 #           By:ika
-#     Update #: 28
+#     Update #: 43
 # URL:
 # Doc URL:
 # Keywords:
@@ -28,13 +28,13 @@
 # compstr:
 #   fullname: 计算机组成与体系结构
 #   abbrev: 计组
-#   time: [[Mon, 8:00, 10:40], [Fri, 16:20, 18:00]]
+#   time: [[Mon, 8:00, 10:40, H3108], [Fri, 16:20, 18:00, H2101]]
 #   path: /path/to/your/course1/folder
 #
 # crypto:
 #   fullname: 密码学基础
 #   abbrev: 密码
-#   time: [[Wed, 8:00, 10:40], [Thu, 16:20, 18:00]]
+#   time: [[Wed, 8:00, 10:40, H3108]]
 #   path: /path/to/your/course/folder
 #
 # Then it goes through the yaml file to generate a daily timetable,
@@ -43,6 +43,11 @@
 
 
 # Change Log:
+# 23-Feb-2023    ika
+#    Last-Updated: Thu Feb 23 15:42:34 2023 (+0800) #36
+#    Added displaying classroom information for classes.
+#    Adjusted output format for class countdown
+#
 # 23-Feb-2023    ika
 #    Last-Updated: Thu Feb 23 15:09:25 2023 (+0800) #27
 #    added countdown for class in progress
@@ -131,7 +136,9 @@ for icourse in courses:
                   itime[2], \
                   # End time
                   courses[icourse]['abbrev'], \
-                  courses[icourse]['path'] \
+                  courses[icourse]['path'] , \
+                  itime[3]
+                  # Classroom
                   ] )
 
 # Sort the timetable for each day so you could select the first one.
@@ -145,8 +152,8 @@ minutes_whole_day = 24*60
 timegap = nextday_1st_class[0] + minutes_whole_day - curtime
 timegap_str = print_timegap(timegap)
 outputstring = \
-    nextday_1st_class [2] + " : In %s " % (timegap_str)
-    # ^^ Class name abbrev
+    nextday_1st_class [2] + " " + nextday_1st_class [4] +" : In %s" % (timegap_str)
+    # ^^ Class name abbrev        ^^ Classroom
 
 
 # If there is still classes today, `outputstring' will be overwritten
@@ -156,7 +163,8 @@ for each_class in timetable[current_day]:
     if curtime < each_class[0]:
         timegap = each_class[0] - curtime
         timegap_str = print_timegap(timegap)
-        outputstring = "In %s : " % (timegap_str) + each_class[2] # Overwritten
+        outputstring = each_class[2] + ' ' + each_class[4] +\
+            " : In %s" % (timegap_str) # Overwritten
         break
     # Timetable is sorted so only choose the first class matched.
 
@@ -164,8 +172,8 @@ for each_class in timetable[current_day]:
     # Oh we're in one right now!
     elif curtime >= each_class[0] and curtime <= each_class[1]:
         timegap = each_class[1] - curtime
-        outputstring = 'In Progress: ' + each_class[2] \
-            + ' | Ends in ' + print_timegap(timegap) # Overwritten
+        outputstring = 'In Progress: ' + each_class[2] + ' ' + each_class[4] + \
+            + ' : Ends in ' + print_timegap(timegap) # Overwritten
         outputpath = each_class[3]
         break                   # no need to find other classes when present in one
     else:
