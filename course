@@ -90,6 +90,15 @@ def nextday(day: str) -> str:
         case 'Fri':
             return 'Mon'
 
+def print_timegap(timegap: int) -> str:
+    if timegap <= 60:
+        timegap_str = str(timegap) + 'm'
+    else:
+        timegap_str = (str( timegap // 60) + 'h ' + str( timegap % 60) + 'm')
+    return timegap_str
+
+
+
 # Calls `date' command to get current weekday, hour, and minute.
 (current_day, current_hour, current_minute) = \
     subprocess.check_output(["date","+%a:%H:%M"])\
@@ -130,11 +139,7 @@ for eachday in timetable:
 nextday_1st_class = timetable[ nextday( current_day)] [0]
 minutes_whole_day = 24*60
 timegap = nextday_1st_class[0] + minutes_whole_day - curtime
-if timegap <= 60:
-    timegap_str = str(timegap) + 'm'
-else:
-    timegap_str = (str( timegap // 60) + 'h ' + str( timegap % 60) + 'm')
-
+timegap_str = print_timegap(timegap)
 outputstring = \
     nextday_1st_class [2] + " : In %s " % (timegap_str)
     # ^^ Class name abbrev
@@ -146,10 +151,7 @@ for each_class in timetable[current_day]:
     # There is a class later?
     if curtime < each_class[0]:
         timegap = each_class[0] - curtime
-        if timegap <= 60:
-            timegap_str = str(timegap) + 'm'
-        else:
-            timegap_str = (str( timegap // 60) + 'h ' + str( timegap % 60) + 'm')
+        timegap_str = print_timegap(timegap)
         outputstring = "In %s : " % (timegap_str) + each_class[2] # Overwritten
         break
     # Timetable is sorted so only choose the first class matched.
@@ -157,7 +159,9 @@ for each_class in timetable[current_day]:
 
     # Oh we're in one right now!
     elif curtime >= each_class[0] and curtime <= each_class[1]:
-        outputstring = 'In Progress: ' + each_class[2] # Overwritten
+        timegap = each_class[1] - curtime
+        outputstring = 'In Progress: ' + each_class[2] \
+            + ' | Ends in ' + print_timegap(timegap) # Overwritten
         outputpath = each_class[3]
         break                   # no need to find other classes when present in one
     else:
