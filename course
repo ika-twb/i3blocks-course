@@ -10,9 +10,9 @@
 # Created: Wed Feb 22 20:29:18 2023 (+0800)
 # Version: v0.1
 # Package-Requires: i3blocks, env, python3.10, date, [emacs, emacsclient]
-# Last-Updated: Thu Feb 23 15:49:09 2023 (+0800)
+# Last-Updated: Fri Feb 24 11:19:45 2023 (+0800)
 #           By:ika
-#     Update #: 43
+#     Update #: 48
 # URL:
 # Doc URL:
 # Keywords:
@@ -43,6 +43,10 @@
 
 
 # Change Log:
+# 24-Feb-2023    ika
+#    Last-Updated: Fri Feb 24 11:16:01 2023 (+0800) #47
+#    Added `output_format', controlling output format.
+#
 # 23-Feb-2023    ika
 #    Last-Updated: Thu Feb 23 15:42:34 2023 (+0800) #36
 #    Added displaying classroom information for classes.
@@ -79,6 +83,8 @@ import os
 
 # Metadata file path
 fmetadata = '/home/ika/course-metadata.yaml'
+output_format = "%s%s %s : %s %s"
+# [In Progress: ]<Classname> <Classroom> : [Ends in |In ] <timegap>
 
 outputstring = ''
 outputpath = ''
@@ -151,8 +157,8 @@ nextday_1st_class = timetable[ nextday( current_day)] [0]
 minutes_whole_day = 24*60
 timegap = nextday_1st_class[0] + minutes_whole_day - curtime
 timegap_str = print_timegap(timegap)
-outputstring = \
-    nextday_1st_class [2] + " " + nextday_1st_class [4] +" : In %s" % (timegap_str)
+outputstring = output_format % \
+    ("", nextday_1st_class [2], nextday_1st_class [4], "In", timegap_str)
     # ^^ Class name abbrev        ^^ Classroom
 
 
@@ -163,17 +169,18 @@ for each_class in timetable[current_day]:
     if curtime < each_class[0]:
         timegap = each_class[0] - curtime
         timegap_str = print_timegap(timegap)
-        outputstring = each_class[2] + ' ' + each_class[4] +\
-            " : In %s" % (timegap_str) # Overwritten
+        outputstring = output_format % \
+            ('', each_class[2], each_class[4], 'In ', timegap_str) # Overwritten
         break
     # Timetable is sorted so only choose the first class matched.
-
 
     # Oh we're in one right now!
     elif curtime >= each_class[0] and curtime <= each_class[1]:
         timegap = each_class[1] - curtime
-        outputstring = 'In Progress: ' + each_class[2] + ' ' + each_class[4] + \
-            + ' : Ends in ' + print_timegap(timegap) # Overwritten
+        timegap_str = print_timegap(timegap)
+        outputstring = output_format % \
+            ('In Progress: ', each_class[2], each_class[4], 'Ends in', timegap_str)
+        # Overwritten
         outputpath = each_class[3]
         break                   # no need to find other classes when present in one
     else:
