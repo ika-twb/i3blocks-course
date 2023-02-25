@@ -4,7 +4,7 @@ An `i3blocks' script to display your current class status in i3 bar.
 More features to come.
 
 ## How does it get information about my courses?
-Write down your course metadata in a yaml file like this:
+Write down your course metadata in a yaml file in a structure like this:
 
 ``` yaml
 compstr:
@@ -43,13 +43,17 @@ interval=60
 
 `interval` is a number of seconds between each running of the script.
 
-If you have Emacs and Emacs client installed, when you right-click the
-botton AND you are currently in a class, an `emacsclient` frame with a
-Dired buffer of the directory for your current class (the `path`) will
-popup.
+If you have Emacs and Emacs client installed AND you are currently in
+a class, you could right-click on the botton and an `emacsclient`
+frame will popup with a Dired buffer of the directory for your current
+class (the `path`), then you could navigate in it to open your notes,
+slides etc. that was stored in that directory.
 
 ## How do I contribute?
 Issues and pull requests always welcome.
+
+## Why is your code so ugly and has wierd spaces?
+I write Lisps from time to time and that's just my aesthetic of clear code.
 
 ## What license does it use?
 This program is free software, it uses GPLv3+.
