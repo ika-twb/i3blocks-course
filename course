@@ -10,9 +10,9 @@
 # Created: Wed Feb 22 20:29:18 2023 (+0800)
 # Version: v0.1
 # Package-Requires: i3blocks, env, python3.10, date, [emacs, emacsclient]
-# Last-Updated: Fri Feb 24 11:19:45 2023 (+0800)
+# Last-Updated: Sat Feb 25 13:42:02 2023 (+0800)
 #           By:ika
-#     Update #: 48
+#     Update #: 51
 # URL:
 # Doc URL:
 # Keywords:
@@ -40,9 +40,16 @@
 # Then it goes through the yaml file to generate a daily timetable,
 # and display if you are currently in class or countdown of your next
 # class.
+# If there's not classes today or tomorrow, it will display the
+# `have_some_rest' string instead.
 
 
 # Change Log:
+# 25-Feb-2023    ika
+#    Last-Updated: Fri Feb 24 19:10:09 2023 (+0800) #49
+#    Added support for weekends.
+#    sucks to have class on weekend but keep on boy.
+#
 # 24-Feb-2023    ika
 #    Last-Updated: Fri Feb 24 11:16:01 2023 (+0800) #47
 #    Added `output_format', controlling output format.
@@ -83,13 +90,15 @@ import os
 
 # Metadata file path
 fmetadata = '/home/ika/course-metadata.yaml'
-output_format = "%s%s %s : %s %s"
+output_format = '%s%s %s : %s %s'
 # [In Progress: ]<Classname> <Classroom> : [Ends in |In ] <timegap>
+have_some_rest = 'No class tomorrow '
 
 outputstring = ''
 outputpath = ''
 
-timetable = {'Mon': [], 'Tue': [], 'Wed': [], 'Thu': [], 'Fri': []}
+timetable = {'Mon': [], 'Tue': [], 'Wed': [], 'Thu': [], 'Fri': [], \
+             'Sat': [], 'Sun': []}
 
 # Lazy job, don't do this kids.
 def nextday(day: str) -> str:
@@ -103,6 +112,10 @@ def nextday(day: str) -> str:
         case 'Thu':
             return 'Fri'
         case 'Fri':
+            return 'Sat'
+        case 'Sat':
+            return 'Sun'
+        case 'Sun':
             return 'Mon'
 
 def print_timegap(timegap: int) -> str:
@@ -116,8 +129,8 @@ def print_timegap(timegap: int) -> str:
 
 # Calls `date' command to get current weekday, hour, and minute.
 (current_day, current_hour, current_minute) = \
-    subprocess.check_output(["date","+%a:%H:%M"])\
-              .strip().decode().split(":")
+    subprocess.check_output(['date','+%a:%H:%M'])\
+              .strip().decode().split(':')
 
 # For debugging
 # (current_day, current_hour, current_minute) = "Thu 21 00".split(" ")
@@ -152,14 +165,19 @@ for eachday in timetable:
     # Sort using start time
     timetable[eachday] = sorted( timetable[eachday], key=lambda a: a[0])
 
+# If you have classes tomorrow, display the first class tomorrow.
+if timetable[ nextday( current_day) ] != []:
+    nextday_1st_class = timetable[ nextday( current_day)] [0]
+    minutes_whole_day = 24*60
+    timegap = nextday_1st_class[0] + minutes_whole_day - curtime
+    timegap_str = print_timegap(timegap)
+    outputstring = output_format % \
+        ('', nextday_1st_class [2], nextday_1st_class [4], 'In', timegap_str)
+        # ^^ Class name abbrev      ^^ Classroom
 
-nextday_1st_class = timetable[ nextday( current_day)] [0]
-minutes_whole_day = 24*60
-timegap = nextday_1st_class[0] + minutes_whole_day - curtime
-timegap_str = print_timegap(timegap)
-outputstring = output_format % \
-    ("", nextday_1st_class [2], nextday_1st_class [4], "In", timegap_str)
-    # ^^ Class name abbrev        ^^ Classroom
+# If you don't have
+else:
+    outputstring = have_some_rest
 
 
 # If there is still classes today, `outputstring' will be overwritten
