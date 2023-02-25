@@ -20,8 +20,6 @@ crypto:
   path: /path/to/your/course2/folder
 ```
 
-and its path is specified using the `fmetadata` variable.
-
 The `time` field should be an array of one or multiple four element array,
 which includes the day of the week, start time, end time,
 and classroom number, in that order.
@@ -35,9 +33,12 @@ then add a segment in your i3blocks config:
 ``` ini
 [course]
 command=$SCRIPT_DIR/course
+METADATA_PATH=/home/ika/course-metadata.yaml
 label=
 interval=60
 ```
+
+`METADATA_PATH` should be the path of your yaml file with courses information
 
 `label` is a string that displays before the program output.
 

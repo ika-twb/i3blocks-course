@@ -10,9 +10,9 @@
 # Created: Wed Feb 22 20:29:18 2023 (+0800)
 # Version: v0.1
 # Package-Requires: i3blocks, env, python3.10, date, [emacs, emacsclient]
-# Last-Updated: Sat Feb 25 13:42:02 2023 (+0800)
+# Last-Updated: Sat Feb 25 13:58:05 2023 (+0800)
 #           By:ika
-#     Update #: 51
+#     Update #: 59
 # URL:
 # Doc URL:
 # Keywords:
@@ -37,14 +37,26 @@
 #   time: [[Wed, 8:00, 10:40, H3108]]
 #   path: /path/to/your/course/folder
 #
+# Then specify the file path in your i3blocks config like this
+#
+# [course]
+# command=$SCRIPT_DIR/course
+# METADATA_PATH=/home/ika/course-metadata.yaml
+# label=
+# interval=60
+#
 # Then it goes through the yaml file to generate a daily timetable,
 # and display if you are currently in class or countdown of your next
 # class.
 # If there's not classes today or tomorrow, it will display the
 # `have_some_rest' string instead.
-
-
+#
 # Change Log:
+# 25-Feb-2023    ika
+#    Last-Updated: Sat Feb 25 13:56:49 2023 (+0800) #57
+#    Path of metadata is now specified in i3blocks config
+#    instead of hardcoded in the script.
+#
 # 25-Feb-2023    ika
 #    Last-Updated: Fri Feb 24 19:10:09 2023 (+0800) #49
 #    Added support for weekends.
@@ -89,7 +101,12 @@ import subprocess
 import os
 
 # Metadata file path
-fmetadata = '/home/ika/course-metadata.yaml'
+if 'METADATA_PATH' in os.environ:
+    fmetadata = os.environ['METADATA_PATH']
+else:
+    print('FATAL ERROR: Class metadata path not specified in env.')
+    exit(0)
+
 output_format = '%s%s %s : %s %s'
 # [In Progress: ]<Classname> <Classroom> : [Ends in |In ] <timegap>
 have_some_rest = 'No class tomorrow '
