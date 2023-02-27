@@ -10,9 +10,9 @@
 # Created: Wed Feb 22 20:29:18 2023 (+0800)
 # Version: v0.1
 # Package-Requires: i3blocks, env, python3.10, date, [emacs, emacsclient]
-# Last-Updated: Sat Feb 25 13:58:05 2023 (+0800)
+# Last-Updated: Mon Feb 27 12:55:20 2023 (+0800)
 #           By:ika
-#     Update #: 59
+#     Update #: 60
 # URL:
 # Doc URL:
 # Keywords:
@@ -52,6 +52,10 @@
 # `have_some_rest' string instead.
 #
 # Change Log:
+# 27-Feb-2023    ika
+#    Last-Updated: Sat Feb 25 13:58:05 2023 (+0800) #59
+#    Fixed the output string of today-next-class part.
+#
 # 25-Feb-2023    ika
 #    Last-Updated: Sat Feb 25 13:56:49 2023 (+0800) #57
 #    Path of metadata is now specified in i3blocks config
@@ -108,7 +112,7 @@ else:
     exit(0)
 
 output_format = '%s%s %s : %s %s'
-# [In Progress: ]<Classname> <Classroom> : [Ends in |In ] <timegap>
+# [In Progress: ]<Classname> <Classroom> : [Ends in|In] <timegap>
 have_some_rest = 'No class tomorrow '
 
 outputstring = ''
@@ -205,7 +209,7 @@ for each_class in timetable[current_day]:
         timegap = each_class[0] - curtime
         timegap_str = print_timegap(timegap)
         outputstring = output_format % \
-            ('', each_class[2], each_class[4], 'In ', timegap_str) # Overwritten
+            ('', each_class[2], each_class[4], 'In', timegap_str) # Overwritten
         break
     # Timetable is sorted so only choose the first class matched.
 
